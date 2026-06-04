@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SMSH</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@700;900&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    width: 100%;
+    min-height: 100vh;
+    background: #000000;
+    color: #ffffff;
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  /* ── BACKGROUND ── */
+  .bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* White glow pool at bottom-left — identical to reference */
+  .bg-glow {
+    position: absolute;
+    bottom: -10%;
+    left: -5%;
+    width: 70%;
+    height: 55%;
+    background: radial-gradient(ellipse at 40% 80%,
+      rgba(200,210,230,0.28) 0%,
+      rgba(160,180,210,0.14) 30%,
+      rgba(100,130,170,0.05) 60%,
+      transparent 100%
+    );
+    filter: blur(2px);
+  }
+
+  /* Concentric arcs top-left */
+  .bg-arcs {
+    position: absolute;
+    top: -18vw;
+    left: -18vw;
+    width: 80vw;
+    height: 80vw;
+    max-width: 700px;
+    max-height: 700px;
+  }
+
+  .bg-arcs circle {
+    fill: none;
+    stroke: rgba(180,195,220,0.055);
+    stroke-width: 1;
+  }
+
+  /* Scanlines — very subtle */
+  .bg-scanlines {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 3px,
+      rgba(0,0,0,0.04) 3px,
+      rgba(0,0,0,0.04) 4px
+    );
+  }
+
+  /* ── PAGE ── */
+  .page {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 24px 80px;
+    gap: 0;
+  }
+
+  /* ── TOP LABEL ── */
+  .top-label {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 32px;
+    z-index: 50;
+  }
+  .top-label span {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    color: rgba(255,255,255,0.35);
+    text-transform: uppercase;
+  }
+
+  /* ── GLASSES ── */
+  .glasses-wrap {
+    margin-bottom: 52px;
+    display: flex;
+    justify-content: center;
+    animation: fadeUp 1s ease 0.1s both;
+  }
+
+  .glasses-svg {
+    width: clamp(240px, 46vw, 420px);
+    height: auto;
+    /* White glow to match the logo's backlit look */
+    filter:
+      drop-shadow(0 0 12px rgba(105,197,248,0.9))
+      drop-shadow(0 0 35px rgba(105,197,248,0.55))
+      drop-shadow(0 0 80px rgba(105,197,248,0.25));
+    animation: glassesGlow 4s ease-in-out infinite;
+  }
+
+  @keyframes glassesGlow {
+    0%,100% {
+      filter:
+        drop-shadow(0 0 10px rgba(105,197,248,0.8))
+        drop-shadow(0 0 30px rgba(105,197,248,0.45))
+        drop-shadow(0 0 70px rgba(105,197,248,0.2));
+    }
+    50% {
+      filter:
+        drop-shadow(0 0 20px rgba(105,197,248,1))
+        drop-shadow(0 0 55px rgba(105,197,248,0.7))
+        drop-shadow(0 0 110px rgba(105,197,248,0.35));
+    }
+  }
+
+  .px-flicker   { animation: pxFlicker 7s steps(1) infinite; }
+  .px-shimmer   { animation: pxShimmer 4s ease-in-out infinite 0s; }
+  .px-shimmer-2 { animation: pxShimmer 4s ease-in-out infinite 0.7s; }
+  .px-shimmer-3 { animation: pxShimmer 4s ease-in-out infinite 1.4s; }
+  .px-shimmer-4 { animation: pxShimmer 4s ease-in-out infinite 2.1s; }
+
+  @keyframes pxShimmer {
+    0%,100% { opacity:1; }
+    45%     { opacity:0.6; }
+  }
+  @keyframes pxFlicker {
+    0%,93%,100% { opacity:1; }
+    94%  { opacity:0.2; }
+    96%  { opacity:1; }
+    98%  { opacity:0.4; }
+    99%  { opacity:1; }
+  }
+
+  /* ── COUNTDOWN ── */
+  .countdown-wrap {
+    text-align: center;
+    animation: fadeUp 1s ease 0.3s both;
+  }
+
+  .countdown {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 0;
+    flex-wrap: nowrap;
+  }
+
+  .cd-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: clamp(36px, 7.5vw, 85px);
+  }
+
+  /* Big number — white top fading to blue-grey bottom, like ref images */
+  .cd-value {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 900;
+    font-size: clamp(24px, 6.5vw, 90px);
+    line-height: 1;
+    background: linear-gradient(180deg,
+      #ffffff 0%,
+      #ffffff 35%,
+      #c8d4e8 65%,
+      #8aa0c0 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    padding: 8px 0 4px;
+    filter: drop-shadow(0 0 18px rgba(255,255,255,0.25));
+    transition: filter 0.1s;
+  }
+
+  .cd-value.tick { animation: numTick 0.15s ease; }
+  @keyframes numTick {
+    0%   { opacity: 0.5; transform: scaleY(0.94); }
+    100% { opacity: 1;   transform: scaleY(1); }
+  }
+
+  .cd-key {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(8px, 1.4vw, 12px);
+    font-weight: 500;
+    letter-spacing: 0.25em;
+    color: rgba(255,255,255,0.28);
+    text-transform: uppercase;
+    margin-top: 6px;
+  }
+
+  .cd-sep {
+    font-family: 'Unbounded', sans-serif;
+    font-weight: 900;
+    font-size: clamp(28px, 7vw, 80px);
+    line-height: 1;
+    padding-top: 8px;
+    color: rgba(255,255,255,0.12);
+    user-select: none;
+    align-self: flex-start;
+  }
+
+  /* ── BUTTONS ── */
+  .cta-row {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 52px;
+    animation: fadeUp 1s ease 0.5s both;
+  }
+
+  .btn-primary {
+    background: #69C5F8;
+    color: #000000;
+    border: none;
+    padding: 15px 36px;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    border-radius: 60px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    white-space: nowrap;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .btn-primary:hover {
+    transform: scale(1.04) translateY(-2px);
+    box-shadow: 0 0 40px rgba(105,197,248,0.45);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: rgba(255,255,255,0.6);
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 15px 36px;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-radius: 60px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    white-space: nowrap;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .btn-secondary:hover {
+    border-color: rgba(255,255,255,0.5);
+    color: #ffffff;
+  }
+
+  /* ── BOTTOM ── */
+  .bottom-strip {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    padding: 16px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 50;
+  }
+  .bottom-strip span {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    color: rgba(255,255,255,0.2);
+    text-transform: uppercase;
+  }
+
+  /* ── ANIMATION ── */
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(16px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  /* ── MOBILE ── */
+  @media (max-width: 768px) {
+    .top-label { padding: 14px 18px; }
+    .bottom-strip { padding: 12px 18px; }
+    .page { padding: 60px 8px 70px; }
+    .glasses-svg { width: clamp(180px, 82vw, 320px); }
+    .glasses-wrap { margin-bottom: 24px; }
+    /* На мобиле таймер должен влезать в 100vw: 5 цифр + 4 sep */
+    /* Используем vw напрямую */
+    .countdown { gap: 0; }
+    .cd-unit { min-width: 0; width: 15vw; }
+    .cd-value { font-size: 9.5vw; padding: 4px 0 2px; }
+    .cd-sep { font-size: 7vw; padding-top: 4px; width: 5vw; text-align: center; }
+    .cd-key { font-size: 8px; letter-spacing: 0.1em; margin-top: 3px; }
+    .cta-row { flex-direction: column; align-items: center; gap: 10px; margin-top: 24px; }
+    .btn-primary, .btn-secondary { width: 90vw; max-width: 360px; text-align: center; }
+  }
+  @media (min-width: 1024px) {
+    .cd-value { font-size: clamp(70px, 8vw, 120px); }
+    .cd-unit { min-width: clamp(90px, 9vw, 130px); }
+    .glasses-svg { width: clamp(360px, 34vw, 500px); }
+    .glasses-wrap { margin-bottom: 52px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- BACKGROUND -->
+<div class="bg">
+  <div class="bg-glow"></div>
+  <!-- Concentric arcs SVG -->
+  <svg class="bg-arcs" viewBox="0 0 700 700" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="350" cy="350" r="120"/>
+    <circle cx="350" cy="350" r="180"/>
+    <circle cx="350" cy="350" r="245"/>
+    <circle cx="350" cy="350" r="315"/>
+    <circle cx="350" cy="350" r="390"/>
+    <circle cx="350" cy="350" r="470"/>
+    <circle cx="350" cy="350" r="555"/>
+  </svg>
+  <div class="bg-scanlines"></div>
+</div>
+
+<!-- TOP -->
+<div class="top-label">
+  <span>SMSH</span>
+  <span>SMSH 2026</span>
+</div>
+
+<!-- PAGE -->
+<main class="page">
+
+  <!-- GLASSES -->
+  <div class="glasses-wrap">
+    <svg class="glasses-svg" viewBox="0 0 36 12" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+
+  <!-- LEFT ARM: top-left + top-right + bottom-right (bottom-left убран) -->
+  <rect x="0" y="4" width="2" height="2" fill="#081421"/>
+  <rect x="2" y="4" width="2" height="2" fill="#081421"/>
+  <rect x="2" y="6" width="2" height="2" fill="#081421"/>
+
+  <!-- LEFT LENS -->
+  <rect x="4"  y="0"  width="12" height="12" fill="#0b1d2e"/>
+  <rect class="px-flicker"   x="6"  y="2"  width="4" height="4" fill="#e8f4ff"/>
+  <rect class="px-shimmer-2" x="10" y="2"  width="4" height="4" fill="#69C5F8"/>
+  <rect class="px-shimmer-3" x="6"  y="6"  width="4" height="4" fill="#1e8fd4"/>
+  <rect class="px-shimmer-4" x="10" y="6"  width="4" height="4" fill="#0d5ca8"/>
+
+  <!-- BRIDGE -->
+  <rect x="16" y="4" width="4" height="4" fill="#081421"/>
+
+  <!-- RIGHT LENS -->
+  <rect x="20" y="0"  width="12" height="12" fill="#0b1d2e"/>
+  <rect class="px-flicker"   x="22" y="2"  width="4" height="4" fill="#e8f4ff"/>
+  <rect class="px-shimmer-2" x="26" y="2"  width="4" height="4" fill="#69C5F8"/>
+  <rect class="px-shimmer-3" x="22" y="6"  width="4" height="4" fill="#1e8fd4"/>
+  <rect class="px-shimmer-4" x="26" y="6"  width="4" height="4" fill="#0d5ca8"/>
+
+  <!-- RIGHT ARM: top-left + top-right + bottom-left (bottom-right убран) -->
+  <rect x="32" y="4" width="2" height="2" fill="#081421"/>
+  <rect x="34" y="4" width="2" height="2" fill="#081421"/>
+  <rect x="32" y="6" width="2" height="2" fill="#081421"/>
+
+</svg>
+  </div>
+
+  <!-- COUNTDOWN -->
+  <div class="countdown-wrap">
+    <div class="countdown" id="countdown">
+      <div class="cd-unit">
+        <div class="cd-value" id="months">--</div>
+        <div class="cd-key">мес</div>
+      </div>
+      <div class="cd-sep">:</div>
+      <div class="cd-unit">
+        <div class="cd-value" id="days">--</div>
+        <div class="cd-key">дн</div>
+      </div>
+      <div class="cd-sep">:</div>
+      <div class="cd-unit">
+        <div class="cd-value" id="hours">--</div>
+        <div class="cd-key">ч</div>
+      </div>
+      <div class="cd-sep">:</div>
+      <div class="cd-unit">
+        <div class="cd-value" id="minutes">--</div>
+        <div class="cd-key">м</div>
+      </div>
+      <div class="cd-sep">:</div>
+      <div class="cd-unit">
+        <div class="cd-value" id="seconds">--</div>
+        <div class="cd-key">с</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-row">
+    <a href="https://youtube.com/@smmassh?si=mK9fwdfsPNR-3609" class="btn-primary" target="_blank" rel="noopener">YouTube канал</a>
+    <a href="https://t.me/smmassh1" class="btn-secondary" target="_blank" rel="noopener">Подписаться на уведомление</a>
+  </div>
+
+</main>
+
+<!-- BOTTOM -->
+<div class="bottom-strip">
+  <span>SMSH © 2026</span>
+  <span>07 · 07 · 2026</span>
+</div>
+
+<script>
+  // Target: July 7, 2026 00:00:00
+  const TARGET = new Date(2026, 6, 7, 0, 0, 0);
+
+  function pad(n) { return String(Math.max(0, Math.floor(n))).padStart(2, '0'); }
+
+  function tick(id, val) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const str = pad(val);
+    if (el.textContent !== str) {
+      el.textContent = str;
+      el.classList.remove('tick');
+      void el.offsetWidth;
+      el.classList.add('tick');
+    }
+  }
+
+  function update() {
+    const now = new Date();
+    const diff = TARGET - now;
+
+    if (diff <= 0) {
+      ['months','days','hours','minutes','seconds'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = '00';
+      });
+      return;
+    }
+
+    // Compute whole months between now and target
+    let tY = TARGET.getFullYear(), tM = TARGET.getMonth(), tD = TARGET.getDate();
+    let nY = now.getFullYear(),    nM = now.getMonth(),    nD = now.getDate();
+    let months = (tY - nY) * 12 + (tM - nM);
+    if (tD < nD) months--;
+    months = Math.max(0, months);
+
+    // Date exactly `months` months from now
+    const base = new Date(now.getFullYear(), now.getMonth() + months,
+                          now.getDate(), now.getHours(), now.getMinutes(), now.getSeconds());
+    const rem = Math.max(0, TARGET - base);
+
+    const totalSec = Math.floor(rem / 1000);
+    const days  = Math.floor(totalSec / 86400);
+    const hours = Math.floor((totalSec % 86400) / 3600);
+    const mins  = Math.floor((totalSec % 3600) / 60);
+    const secs  = totalSec % 60;
+
+    tick('months',  months);
+    tick('days',    days);
+    tick('hours',   hours);
+    tick('minutes', mins);
+    tick('seconds', secs);
+  }
+
+  update();
+  setInterval(update, 1000);
+
+  // Random pixel flicker
+  (function() {
+    const els = document.querySelectorAll('.px-shimmer-2, .px-shimmer-3, .px-shimmer-4');
+    function flicker() {
+      if (!els.length) return;
+      const el = els[Math.floor(Math.random() * els.length)];
+      const orig = el.getAttribute('fill');
+      el.setAttribute('fill', Math.random() > 0.5 ? '#a8deff' : '#ffffff');
+      setTimeout(() => el.setAttribute('fill', orig), 70 + Math.random() * 90);
+    }
+    setInterval(flicker, 350);
+    setInterval(flicker, 650);
+  })();
+</script>
+</body>
+</html>
