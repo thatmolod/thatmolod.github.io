@@ -15,7 +15,7 @@
     color: #ffffff;
     font-family: 'Inter', sans-serif;
     overflow-x: hidden;
-    cursor: crosshair;
+    cursor: default;
   }
 
   /* ── BACKGROUND ── */
@@ -28,19 +28,19 @@
 
   /* White glow pool at bottom-left — identical to reference */
   .bg-glow {
-    position: fixed;
-    top: 50%;
+    position: absolute;
+    bottom: -10%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translateX(-50%);
     width: 100%;
-    height: 100%;
-    background: radial-gradient(ellipse at 40% 80%,
-      rgba(200,210,230,0.28) 0%,
-      rgba(160,180,210,0.14) 30%,
-      rgba(100,130,170,0.05) 60%,
+    height: 60%;
+    background: radial-gradient(ellipse at 50% 80%,
+      rgba(200,210,230,0.32) 0%,
+      rgba(160,180,210,0.16) 25%,
+      rgba(100,130,170,0.06) 50%,
       transparent 100%
     );
-    filter: blur(2px);
+    filter: blur(3px);
   }
 
   /* Concentric arcs top-left */
@@ -67,9 +67,9 @@
     background: repeating-linear-gradient(
       0deg,
       transparent,
-      transparent 3px,
-      rgba(0,0,0,0.04) 3px,
-      rgba(0,0,0,0.04) 4px
+      transparent 2px,
+      rgba(0,0,0,0.03) 2px,
+      rgba(0,0,0,0.03) 3px
     );
   }
 
@@ -82,8 +82,11 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 60px 24px 80px;
+    padding: 70px 20px 90px;
     gap: 0;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
   }
 
   /* ── TOP LABEL ── */
@@ -127,15 +130,15 @@
   @keyframes glassesGlow {
     0%,100% {
       filter:
-        drop-shadow(0 0 10px rgba(105,197,248,0.8))
-        drop-shadow(0 0 30px rgba(105,197,248,0.45))
-        drop-shadow(0 0 70px rgba(105,197,248,0.2));
+        drop-shadow(0 0 12px rgba(105,197,248,0.85))
+        drop-shadow(0 0 35px rgba(105,197,248,0.5))
+        drop-shadow(0 0 80px rgba(105,197,248,0.25));
     }
     50% {
       filter:
-        drop-shadow(0 0 20px rgba(105,197,248,1))
-        drop-shadow(0 0 55px rgba(105,197,248,0.7))
-        drop-shadow(0 0 110px rgba(105,197,248,0.35));
+        drop-shadow(0 0 22px rgba(105,197,248,1))
+        drop-shadow(0 0 60px rgba(105,197,248,0.75))
+        drop-shadow(0 0 120px rgba(105,197,248,0.4));
     }
   }
 
@@ -169,6 +172,8 @@
     justify-content: center;
     gap: 0;
     flex-wrap: nowrap;
+    width: 100%;
+    max-width: 100%;
   }
 
   .cd-unit {
@@ -239,9 +244,9 @@
     background: #69C5F8;
     color: #000000;
     border: none;
-    padding: 15px 36px;
+    padding: 16px 40px;
     font-family: 'Unbounded', sans-serif;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.12em;
     text-transform: uppercase;
@@ -251,19 +256,26 @@
     display: inline-block;
     white-space: nowrap;
     transition: transform 0.15s, box-shadow 0.15s;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   .btn-primary:hover {
     transform: scale(1.04) translateY(-2px);
     box-shadow: 0 0 40px rgba(105,197,248,0.45);
+  }
+  .btn-primary:active {
+    transform: scale(0.98);
   }
 
   .btn-secondary {
     background: transparent;
     color: rgba(255,255,255,0.6);
     border: 1px solid rgba(255,255,255,0.2);
-    padding: 15px 36px;
+    padding: 16px 40px;
     font-family: 'Inter', sans-serif;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 500;
     letter-spacing: 0.1em;
     text-transform: uppercase;
@@ -273,10 +285,17 @@
     display: inline-block;
     white-space: nowrap;
     transition: border-color 0.15s, color 0.15s;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   .btn-secondary:hover {
     border-color: rgba(255,255,255,0.5);
     color: #ffffff;
+  }
+  .btn-secondary:active {
+    opacity: 0.8;
   }
 
   /* ── BOTTOM ── */
@@ -305,27 +324,43 @@
   }
 
   /* ── MOBILE ── */
-  @media (max-width: 768px) {
+  @media (max-width: 480px) {
+    .top-label { padding: 12px 14px; font-size: 9px; }
+    .bottom-strip { padding: 10px 14px; }
+    .page { padding: 50px 6px 60px; }
+    .glasses-svg { width: clamp(160px, 80vw, 280px); }
+    .glasses-wrap { margin-bottom: 18px; }
+    .countdown { gap: 0; }
+    .cd-unit { min-width: 0; width: 15.5vw; }
+    .cd-value { font-size: 9.5vw; padding: 3px 0 1px; line-height: 0.95; }
+    .cd-sep { font-size: 6.8vw; padding-top: 3px; width: 4.5vw; text-align: center; }
+    .cd-key { font-size: 7px; letter-spacing: 0.08em; margin-top: 2px; }
+    .cta-row { flex-direction: column; align-items: center; gap: 8px; margin-top: 20px; }
+    .btn-primary, .btn-secondary { width: 90vw; max-width: 320px; font-size: 10px; padding: 12px 28px; }
+  }
+  @media (min-width: 481px) and (max-width: 768px) {
     .top-label { padding: 14px 18px; }
     .bottom-strip { padding: 12px 18px; }
     .page { padding: 60px 8px 70px; }
-    .glasses-svg { width: clamp(180px, 82vw, 320px); }
-    .glasses-wrap { margin-bottom: 24px; }
-    /* На мобиле таймер должен влезать в 100vw: 5 цифр + 4 sep */
-    /* Используем vw напрямую */
+    .glasses-svg { width: clamp(200px, 85vw, 350px); }
+    .glasses-wrap { margin-bottom: 26px; }
     .countdown { gap: 0; }
     .cd-unit { min-width: 0; width: 15vw; }
-    .cd-value { font-size: 9.5vw; padding: 4px 0 2px; }
-    .cd-sep { font-size: 7vw; padding-top: 4px; width: 5vw; text-align: center; }
+    .cd-value { font-size: 9.2vw; padding: 4px 0 2px; }
+    .cd-sep { font-size: 6.8vw; padding-top: 4px; width: 5vw; text-align: center; }
     .cd-key { font-size: 8px; letter-spacing: 0.1em; margin-top: 3px; }
-    .cta-row { flex-direction: column; align-items: center; gap: 10px; margin-top: 24px; }
-    .btn-primary, .btn-secondary { width: 90vw; max-width: 360px; text-align: center; }
+    .cta-row { flex-direction: column; align-items: center; gap: 9px; margin-top: 26px; }
+    .btn-primary, .btn-secondary { width: 80vw; max-width: 360px; text-align: center; }
   }
-  @media (min-width: 1024px) {
-    .cd-value { font-size: clamp(70px, 8vw, 120px); }
-    .cd-unit { min-width: clamp(90px, 9vw, 130px); }
-    .glasses-svg { width: clamp(360px, 34vw, 500px); }
-    .glasses-wrap { margin-bottom: 52px; }
+  @media (min-width: 769px) {
+    .cd-value { font-size: clamp(60px, 8vw, 120px); }
+    .cd-unit { min-width: clamp(80px, 9vw, 140px); }
+    .cd-sep { font-size: clamp(48px, 6.5vw, 95px); }
+    .glasses-svg { width: clamp(320px, 32vw, 520px); }
+    .glasses-wrap { margin-bottom: 48px; }
+    .page { padding: 70px 24px 90px; }
+    .cta-row { gap: 16px; margin-top: 48px; }
+    .btn-primary, .btn-secondary { padding: 16px 40px; font-size: 12px; }
   }
 </style>
 </head>
@@ -358,34 +393,40 @@
 
   <!-- GLASSES -->
   <div class="glasses-wrap">
-    <svg class="glasses-svg" viewBox="0 0 36 12" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+    <svg class="glasses-svg" viewBox="0 0 20 8" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
 
-  <!-- LEFT ARM: top-left + top-right + bottom-right (bottom-left убран) -->
-  <rect x="0" y="4" width="2" height="2" fill="#081421"/>
+  <!-- LEFT ARM: TL + TR + BR (вплотную к линзе) -->
+  <rect x="0" y="2" width="2" height="2" fill="#081421"/>
+  <rect x="2" y="2" width="2" height="2" fill="#081421"/>
   <rect x="2" y="4" width="2" height="2" fill="#081421"/>
-  <rect x="2" y="6" width="2" height="2" fill="#081421"/>
 
-  <!-- LEFT LENS -->
-  <rect x="4"  y="0"  width="12" height="12" fill="#0b1d2e"/>
-  <rect class="px-flicker"   x="6"  y="2"  width="4" height="4" fill="#e8f4ff"/>
-  <rect class="px-shimmer-2" x="10" y="2"  width="4" height="4" fill="#69C5F8"/>
-  <rect class="px-shimmer-3" x="6"  y="6"  width="4" height="4" fill="#1e8fd4"/>
-  <rect class="px-shimmer-4" x="10" y="6"  width="4" height="4" fill="#0d5ca8"/>
+  <!-- LEFT LENS (сразу после дужки, x=4..7) -->
 
-  <!-- BRIDGE -->
-  <rect x="16" y="4" width="4" height="4" fill="#081421"/>
+  <rect x="4" y="0"  width="4" height="2" fill="#0b1d2e"/>
+  <rect x="4" y="6"  width="4" height="2" fill="#0b1d2e"/>
+  <rect x="4" y="2"  width="4" height="4" fill="#0b1d2e"/>
+  <rect class="px-flicker"   x="4" y="2" width="2" height="2" fill="#e8f4ff"/>
+  <rect class="px-shimmer-2" x="6" y="2" width="2" height="2" fill="#69C5F8"/>
+  <rect class="px-shimmer-3" x="4" y="4" width="2" height="2" fill="#1e8fd4"/>
+  <rect class="px-shimmer-4" x="6" y="4" width="2" height="2" fill="#0d5ca8"/>
 
-  <!-- RIGHT LENS -->
-  <rect x="20" y="0"  width="12" height="12" fill="#0b1d2e"/>
-  <rect class="px-flicker"   x="22" y="2"  width="4" height="4" fill="#e8f4ff"/>
-  <rect class="px-shimmer-2" x="26" y="2"  width="4" height="4" fill="#69C5F8"/>
-  <rect class="px-shimmer-3" x="22" y="6"  width="4" height="4" fill="#1e8fd4"/>
-  <rect class="px-shimmer-4" x="26" y="6"  width="4" height="4" fill="#0d5ca8"/>
+  <!-- BRIDGE (сразу после линзы, x=8..11) -->
+  <rect x="8" y="2" width="4" height="4" fill="#081421"/>
 
-  <!-- RIGHT ARM: top-left + top-right + bottom-left (bottom-right убран) -->
-  <rect x="32" y="4" width="2" height="2" fill="#081421"/>
-  <rect x="34" y="4" width="2" height="2" fill="#081421"/>
-  <rect x="32" y="6" width="2" height="2" fill="#081421"/>
+  <!-- RIGHT LENS (сразу после моста, x=12..15) -->
+
+  <rect x="12" y="0"  width="4" height="2" fill="#0b1d2e"/>
+  <rect x="12" y="6"  width="4" height="2" fill="#0b1d2e"/>
+  <rect x="12" y="2"  width="4" height="4" fill="#0b1d2e"/>
+  <rect class="px-flicker"   x="12" y="2" width="2" height="2" fill="#e8f4ff"/>
+  <rect class="px-shimmer-2" x="14" y="2" width="2" height="2" fill="#69C5F8"/>
+  <rect class="px-shimmer-3" x="12" y="4" width="2" height="2" fill="#1e8fd4"/>
+  <rect class="px-shimmer-4" x="14" y="4" width="2" height="2" fill="#0d5ca8"/>
+
+  <!-- RIGHT ARM: TL + TR + BL (сразу после линзы, x=16..19) -->
+  <rect x="16" y="2" width="2" height="2" fill="#081421"/>
+  <rect x="18" y="2" width="2" height="2" fill="#081421"/>
+  <rect x="16" y="4" width="2" height="2" fill="#081421"/>
 
 </svg>
   </div>
